@@ -2,7 +2,6 @@ import fs from "fs/promises";
 import { nanoid } from "nanoid";
 import path from "path";
 
-// const contactsPath = path.join(__dirname, "db", "contacts.json");
 const contactsPath = path.resolve("models", "contacts", "contacts.json");
 
 const updateList = async (contacts) => {
@@ -32,7 +31,6 @@ export const removeContact = async (contactId) => {
 };
 
 export const addContact = async (data) => {
-  console.log("addContact");
   const contacts = await listContacts();
   const newContact = {
     id: nanoid(),
@@ -43,18 +41,13 @@ export const addContact = async (data) => {
   return newContact;
 };
 
-export const updateContact = async (contactId, { name, email, phone }) => {
-  const movies = await getAllMovies();
-  console.log("updateContact");
+export const updateContact = async (contactId, data) => {
+  const contacts = await listContacts();
   const index = contacts.findIndex((item) => item.id === contactId);
   if (index === -1) {
     return null;
   }
-  contacts[index] = { contactId, name, email, phone };
-  // "id": "qdggE76Jtbfd9eWJHrssH",
-  //   "name": "Chaim Lewis",
-  //   "email": "dui.in@egetlacus.ca",
-  //   "phone": "(294) 840-6685"
+  contacts[index] = { id: contactId, ...data };
   await updateList(contacts);
   return contacts[index];
 };

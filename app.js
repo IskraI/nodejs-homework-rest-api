@@ -18,8 +18,12 @@ app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
-app.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message });
+app.use((error, req, res, next) => {
+  let { status = 500, message } = error;
+  if (status === 500) {
+    message = "Server error";
+  }
+  res.status(status).json({ message });
 });
 
 export default app;
