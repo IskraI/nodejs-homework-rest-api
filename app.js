@@ -20,9 +20,9 @@ app.use((req, res) => {
 
 app.use((error, req, res, next) => {
   let { status = 500, message } = error;
-  if (status === 500) {
-    message = "Server error";
-  }
+  // if (status === 500) {
+  //   message = "Server error";
+  // }
   res.status(status).json({ message });
 });
 
