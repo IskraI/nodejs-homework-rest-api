@@ -7,12 +7,22 @@ const contactSchema = Joi.object({
   }),
   email: Joi.string().email({ minDomainSegments: 2 }).required().messages({
     "any.required": `missing required 'email' field' `,
+
     "string.empty": `'email' cannot be an empty field`,
   }),
   phone: Joi.string().required().messages({
     "any.required": `missing required 'phone' field `,
     "string.empty": `'phone' cannot be an empty field`,
   }),
+  favorite: Joi.boolean().messages({
+    "any.required": `missing required 'favorite' field `,
+  }),
 });
 
-export default contactSchema;
+const contactUpdateFavoriteSchema = Joi.object({
+  favorite: Joi.boolean().required().messages({
+    "any.required": `missing required 'favorite' field `,
+  }),
+});
+
+export default { contactSchema, contactUpdateFavoriteSchema };
