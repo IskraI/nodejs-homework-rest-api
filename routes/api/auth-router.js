@@ -22,13 +22,13 @@ authRouter.post(
 
 authRouter.get("/current", validation.authenticate, authController.currentUser);
 
-// authRouter.post("/logout", authenticate, ctrl.logout);
+authRouter.post("/logout", validation.authenticate, authController.logout);
 
-// authRouter.patch(
-//   "/",
-//   authenticate,
-//   validateBody(schemas.updateSubscriptionSchema),
-//   ctrl.updateSubscriptionUser
-// );
+authRouter.patch(
+  "/",
+  validation.authenticate,
+  validation.validateBody(usersSchemas.updateSubscriptionSchema),
+  authController.updateSubscriptionUser
+);
 
 export default authRouter;

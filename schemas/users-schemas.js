@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { emailRegexp } from "../constants/user-constants.js";
+import { emailRegexp, subscriptionList } from "../constants/user-constants.js";
 
 const userRegisterSchema = Joi.object({
   // name: Joi.string().required(),
@@ -33,7 +33,18 @@ const userLoginSchema = Joi.object({
   token: Joi.string(),
 });
 
+const updateSubscriptionSchema = Joi.object({
+  subscription: Joi.string()
+    .valid(...subscriptionList)
+    .required()
+    .messages({
+      "any.required": 'missing field "subscription"',
+      "any.only": `Must be one of 'starter', 'pro', or 'business'`,
+    }),
+});
+
 export default {
   userRegisterSchema,
   userLoginSchema,
+  updateSubscriptionSchema,
 };
