@@ -27,7 +27,7 @@ const register = async (req, res) => {
 
   res
     .status(201)
-    .json({ email: result.email, subscription: result.subscription });
+    .json({ user: { email: result.email, subscription: result.subscription } });
 };
 
 const login = async (req, res) => {
