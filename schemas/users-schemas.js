@@ -15,6 +15,7 @@ const userRegisterSchema = Joi.object({
   }),
   subscription: Joi.string(),
   token: Joi.string(),
+  // avatarURL: Joi.string(),
 });
 
 const userLoginSchema = Joi.object({

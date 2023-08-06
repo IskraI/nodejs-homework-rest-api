@@ -6,12 +6,20 @@ import { HttpError, ctrlWrapper } from "../helpers/index.js";
 
 //hash password
 import bcrypt from "bcryptjs";
+//create avatar
+import gravatar from "gravatar";
 
 //create token
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+//files
+import fs from "fs/promises";
+import path from "path";
+import Jimp from "jimp";
 
 const { JWT_SECRET } = process.env;
+
+const avatarsPath = path.resolve("public", "avatars");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -22,12 +30,22 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+  const avatarURL = gravatar.url(email);
+  // console.log("avatarURL", avatarURL);
 
-  const result = await User.create({ ...req.body, password: hashPassword });
+  const result = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
 
-  res
-    .status(201)
-    .json({ user: { email: result.email, subscription: result.subscription } });
+  res.status(201).json({
+    user: {
+      email: result.email,
+      subscription: result.subscription,
+      avatarURL: result.avatarURL,
+    },
+  });
 };
 
 const login = async (req, res) => {
@@ -71,10 +89,33 @@ const updateSubscriptionUser = async (req, res) => {
   res.json(result);
 };
 
+const updateAvatar = async (req, res) => {
+  if (!req.file) {
+    throw HttpError(404, "Please add file for upload");
+  }
+  const { _id } = req.user;
+
+  const { path: oldPath, originalname } = req.file;
+  const filename = `${_id}_${originalname}`;
+
+  const newPath = path.join(avatarsPath, filename);
+  await fs.rename(oldPath, newPath);
+
+  const resizeFile = await Jimp.read(newPath);
+  await resizeFile.resize(250, 250).write(newPath);
+
+  const avatarURL = path.join("avatars", filename);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+  res.json({
+    avatarURL,
+  });
+};
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   currentUser: ctrlWrapper(currentUser),
   logout: ctrlWrapper(logout),
   updateSubscriptionUser: ctrlWrapper(updateSubscriptionUser),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
