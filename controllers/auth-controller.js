@@ -19,8 +19,6 @@ import Jimp from "jimp";
 
 const { JWT_SECRET } = process.env;
 
-const avatarsPath = path.resolve("public", "avatars");
-
 const register = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -31,7 +29,6 @@ const register = async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
   const avatarURL = gravatar.url(email);
-  // console.log("avatarURL", avatarURL);
 
   const result = await User.create({
     ...req.body,
@@ -89,14 +86,18 @@ const updateSubscriptionUser = async (req, res) => {
   res.json(result);
 };
 
+const avatarsPath = path.resolve("public", "avatars");
+
 const updateAvatar = async (req, res) => {
   if (!req.file) {
-    throw HttpError(404, "Please add file for upload");
+    throw HttpError(404, "Please add file ");
   }
   const { _id } = req.user;
 
   const { path: oldPath, originalname } = req.file;
   const filename = `${_id}_${originalname}`;
+  console.log("req.file", req.file);
+  console.log("oldPath", oldPath);
 
   const newPath = path.join(avatarsPath, filename);
   await fs.rename(oldPath, newPath);
