@@ -96,21 +96,33 @@ const updateAvatar = async (req, res) => {
 
   const { path: oldPath, originalname } = req.file;
   const filename = `${_id}_${originalname}`;
-  // console.log("req.file", req.file);
-  // console.log("oldPath", oldPath);
 
   const newPath = path.join(avatarsPath, filename);
   await fs.rename(oldPath, newPath);
   const oldFile = path.resolve("public", avatarURL);
-  // console.log("oldFile", oldFile);
+
   const resizeFile = await Jimp.read(newPath);
   await resizeFile.resize(250, 250).write(newPath);
-  await fs.unlink(oldFile);
-  const avatarURLN = path.join("avatars", filename);
-  await User.findByIdAndUpdate(_id, { avatarURL: avatarURLN });
-  res.json({
-    avatarURL,
-  });
+
+  if (oldFile.includes("avatars")) {
+    try {
+      await fs.readFile(oldFile);
+      await fs.unlink(oldFile);
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+  const avatarNewURL = path.join("avatars", filename);
+
+  const result = await User.findByIdAndUpdate(
+    _id,
+    { avatarURL: avatarNewURL },
+    {
+      new: true,
+    }
+  );
+
+  res.json({ avatarURL: result.avatarURL });
 };
 
 export default {
