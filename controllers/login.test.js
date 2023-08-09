@@ -82,3 +82,7 @@ describe("test login controller", () => {
     expect(body).toHaveProperty("message", "Email or password is wrong");
   });
 });
+
+//Vibkd(d.zsHy2Dwq
+//API
+// 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
