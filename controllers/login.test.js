@@ -30,14 +30,16 @@ describe("test login controller", () => {
   });
 
   test("test login status 200", async () => {
+    //find user and verify to true
+    const user = await User.findOne({ email: loginData.email });
+    await User.findByIdAndUpdate(user._id, { verify: true });
     //чтоб отправить запрос на бекєнд используем supertest
     const { statusCode, body } = await request(app)
       .post("/users/login")
       .send(loginData);
 
     //находим юзера в базе
-    const user = await User.findOne({ email: loginData.email });
-    expect(user).toBeTruthy();
+    // expect(user).toBeTruthy();
     // проверяем ответ
     expect(statusCode).toBe(200);
   });
@@ -68,6 +70,22 @@ describe("test login controller", () => {
     expect(typeof body.user.email).toBe("string");
     expect(typeof body.user.subscription).toBe("string");
   });
+  test("test login not verify email", async () => {
+    //find user and verify to true
+    const user = await User.findOne({ email: loginData.email });
+    await User.findByIdAndUpdate(user._id, { verify: false });
+    //чтоб отправить запрос на бекєнд используем supertest
+    const { statusCode, body } = await request(app)
+      .post("/users/login")
+      .send(loginData);
+
+    //находим юзера в базе
+    // expect(user).toBeTruthy();
+    // проверяем ответ
+    expect(statusCode).toBe(401);
+    expect(body).toHaveProperty("message", "Email not verify");
+  });
+
   test("login invalid user", async () => {
     const invalidLoginData = {
       email: "invalid@test.com",
